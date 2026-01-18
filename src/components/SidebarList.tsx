@@ -45,7 +45,7 @@ export function SidebarList({
     // Mark that this is not an external update
     isExternalUpdateRef.current = false;
 
-    // Auto-apply changes to wheel
+    // Auto-apply changes to wheel immediately
     const lines = newValue.split('\n').filter(line => line.trim() !== '');
     if (lines.length > 100) {
       alert('В списке слишком много элементов. Не может превышать 100 элементов.');
@@ -55,34 +55,23 @@ export function SidebarList({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    // Allow Shift+Enter for new line, Enter applies changes
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      const newValue = textareaValue + '\n';
-      setTextareaValue(newValue);
-      const lines = newValue.split('\n').filter(line => line.trim() !== '');
-      if (lines.length > 100) {
-        alert('В списке слишком много элементов. Не может превышать 100 элементов.');
-        return;
-      }
-      onItemsChange(lines);
-    }
+    // Enter works normally for new line
   };
 
   const handleEditClick = () => {
     setTextareaValue(items.join('\n'));
     setIsEditing(true);
     setIsHidingMode(false);
+    // Focus textarea after a small delay to ensure it's rendered
+    setTimeout(() => {
+      if (textareaRef.current) {
+        textareaRef.current.focus();
+      }
+    }, 0);
   };
 
   const handleFinish = () => {
-    // Apply changes when finishing editing
-    const lines = textareaValue.split('\n').filter(line => line.trim() !== '');
-    if (lines.length > 100) {
-      alert('В списке слишком много элементов. Не может превышать 100 элементов.');
-      return;
-    }
-    onItemsChange(lines);
+    // Just exit editing mode - changes are already applied in real-time via handleChange
     setIsEditing(false);
     setIsHidingMode(false);
   };
@@ -172,6 +161,7 @@ export function SidebarList({
         onChange={handleChange}
         onKeyDown={handleKeyDown}
         disabled={disabled}
+        autoFocus={isEditing && !isHidingMode}
       />
 
       {/* Names show - displayed when not editing */}
@@ -353,3 +343,4 @@ export function SidebarList({
     </div>
   );
 }
+

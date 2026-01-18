@@ -1,6 +1,6 @@
 import { useParams, Link } from 'react-router-dom';
 import { getCategoryBySlug } from '../data/categories';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Navbar } from '../components/Navbar';
 import WheelBlock from '../components/WheelBlock';
 import { SidebarList } from '../components/SidebarList';
@@ -21,8 +21,16 @@ export function WheelPage() {
   const [showResultAlert, setShowResultAlert] = useState(false);
   const [hiddenIndices, setHiddenIndices] = useState<number[]>([]);
   const [isSpinning, setIsSpinning] = useState(false);
+  const [editableItems, setEditableItems] = useState<string[]>(category?.items || []);
 
-  const items = category?.items || [];
+  // Update editableItems when category changes
+  useEffect(() => {
+    if (category?.items) {
+      setEditableItems(category.items);
+    }
+  }, [category]);
+
+  const items = editableItems;
   const title = category?.heading || category?.name || 'Колесо';
 
   const handleCloseResultAlert = useCallback(() => {
@@ -48,6 +56,16 @@ export function WheelPage() {
     setSelectedIndex(undefined);
     setSelectedValue(undefined);
     setHiddenIndices([]);
+    if (category?.items) {
+      setEditableItems(category.items);
+    }
+  }, [category]);
+
+  const handleCategorySelect = useCallback((items: string[], categoryName: string) => {
+    setEditableItems(items);
+    setSelectedIndex(undefined);
+    setSelectedValue(undefined);
+    setShowResultAlert(false);
   }, []);
 
   const handleHotkeyAction = useCallback((action: HotkeyAction) => {
@@ -206,7 +224,7 @@ export function WheelPage() {
               <div id="sidebar" className="col-12 mt-xl-0 flex-column col-xl-3 d-flex">
                 <SidebarList
                   items={items}
-                  onItemsChange={() => {}}
+                  onItemsChange={setEditableItems}
                   selectedIndex={selectedIndex}
                   disabled={isSpinning}
                   onEditTitle={() => {}}
@@ -215,7 +233,7 @@ export function WheelPage() {
                   onHiddenIndicesChange={setHiddenIndices}
                   forceEditMode={false}
                   forceHideMode={false}
-                  onCategorySelect={() => {}}
+                  onCategorySelect={handleCategorySelect}
                   isSpinning={isSpinning}
                 />
               </div>

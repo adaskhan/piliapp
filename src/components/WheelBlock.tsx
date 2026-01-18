@@ -3,11 +3,27 @@ import { playTickSound, playWinSound } from "../utils/sound";
 import "../styles/piliapp-wheel.css";
 
 const COLORS = [
-  "#2F6BFF", // синий
-  "#FF7B6E", // красно-коралловый
-  "#7CFF7A", // салатовый/зелёный
-  "#E6B9FF", // сиреневый
-  "#F6E7B2", // бежевый/песочный
+  "#2F6BFF", // синий / royalblue
+  "#FF7B6E", // красно-коралловый / salmon
+  "#7CFF7A", // салатовый/зелёный / palegreen
+  "#E6B9FF", // сиреневый / plum
+  "#F6E7B2", // бежевый/песочный / wheat
+];
+
+// Special colors for default wheel (12 elements: "1".."12") - matches piliapp exactly
+const DEFAULT_WHEEL_COLORS = [
+  "#2F6BFF", // 1: royalblue
+  "#FF7B6E", // 2: salmon
+  "#7CFF7A", // 3: palegreen
+  "#F6E7B2", // 4: wheat
+  "#E6B9FF", // 5: plum
+  "#2F6BFF", // 6: royalblue
+  "#FF7B6E", // 7: salmon
+  "#7CFF7A", // 8: palegreen
+  "#F6E7B2", // 9: wheat
+  "#E6B9FF", // 10: plum
+  "#7CFF7A", // 11: palegreen
+  "#F6E7B2", // 12: wheat
 ];
 
 // Cubic bezier easing function matching CSS cubic-bezier(0.6, 0, 0, 1)
@@ -68,34 +84,41 @@ export default function WheelBlock({
   const visibleItems = items.filter((_, index) => !hiddenIndices.includes(index));
 
   const sectorColors = useMemo(() => {
-    // Generate colors deterministically ensuring no adjacent repeats
+    // Check if this is the default wheel (12 elements: "1".."12")
+    const isDefaultWheel = visibleItems.length === 12 &&
+      visibleItems.every((item, index) => item === String(index + 1));
+
+    if (isDefaultWheel) {
+      return DEFAULT_WHEEL_COLORS;
+    }
+
+    // Otherwise, use the general algorithm
     const colors: string[] = [];
     const numColors = COLORS.length;
 
+    // 1. Базовая очередь - раскрашиваем по циклу
     for (let i = 0; i < visibleItems.length; i++) {
-      // Use a deterministic pattern based on position
-      let colorIndex = i % numColors;
-
-      // Ensure no adjacent repeats
-      if (i > 0 && colorIndex === ((i - 1) % numColors)) {
-        colorIndex = (colorIndex + 1) % numColors;
-      }
-
-      colors.push(COLORS[colorIndex]);
+      colors.push(COLORS[i % numColors]);
     }
 
-    // Ensure first and last segments are different
-    if (colors.length > 1 && colors[0] === colors[colors.length - 1]) {
-      const lastIndex = colors.length - 1;
-      const prevColorIndex = COLORS.indexOf(colors[lastIndex - 1]);
-      const firstColorIndex = COLORS.indexOf(colors[0]);
+    // 2. Пост-фикс: убираем соседние повторы (последовательно)
+    for (let i = 1; i < colors.length; i++) {
+      let attempts = 0;
+      while (colors[i] === colors[i - 1] && attempts < numColors) {
+        const currentIndex = COLORS.indexOf(colors[i]);
+        colors[i] = COLORS[(currentIndex + 1) % numColors];
+        attempts++;
+      }
+    }
 
-      // Find a color that's different from both first and previous
-      for (let i = 0; i < numColors; i++) {
-        if (i !== firstColorIndex && i !== prevColorIndex) {
-          colors[lastIndex] = COLORS[i];
-          break;
-        }
+    // 3. Круговая стыковка: последний ≠ первый
+    if (colors.length > 1) {
+      let attempts = 0;
+      while (colors[colors.length - 1] === colors[0] && attempts < numColors) {
+        const lastIndex = colors.length - 1;
+        const currentColorIndex = COLORS.indexOf(colors[lastIndex]);
+        colors[lastIndex] = COLORS[(currentColorIndex + 1) % numColors];
+        attempts++;
       }
     }
 
@@ -281,7 +304,7 @@ function drawWheel(
   }
 
   for (let i = 0; i < N; i++) {
-    const start = i * step;
+    const start = i * step + Math.PI - 0.4; // Start from 9 o'clock (left side)
     const end = start + step;
 
     // сектор
