@@ -2006,6 +2006,11 @@ html[data-mode=moving] #names-show {
     display: none !important;
   }
 
+  /* Ширина кнопок edit-bar на мобильных */
+  #edit-bar .btn-outline-secondary {
+    width: 85px !important;
+  }
+
   /* Font size для результата на мобильных */
   .result-text {
     font-size: 28px !important;
