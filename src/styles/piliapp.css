@@ -1988,10 +1988,39 @@ html[data-mode=moving] #names-show {
 
   #edit-bar {
     order: 1;
+    margin-bottom: 3px;
+  }
+
+  #names {
+    order: 2;
+    height: 211px !important;
+    width: calc(100% - 6px) !important;
   }
 
   #names-show {
     order: 2;
+  }
+
+  /* Скрываем разделитель на мобильных */
+  .edit-divider {
+    display: none !important;
+  }
+
+  /* Font size для результата на мобильных */
+  .result-text {
+    font-size: 28px !important;
+  }
+
+  /* Скрываем кнопки баннера на мобильных */
+  .result-close-btn,
+  .result-hide-btn {
+    display: none !important;
+  }
+
+  /* Отступ для кнопки скрыть результат на мобильных */
+  #hide-result-wrapper {
+    margin-top: 7px !important;
+    margin-bottom: 7px !important;
   }
 }
 

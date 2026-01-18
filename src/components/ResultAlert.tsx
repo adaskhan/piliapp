@@ -20,6 +20,7 @@ export function ResultAlert({ result, onClose, onHide, sectorColor = '#e74c3c' }
       {/* Close button X - left */}
       <button
         onClick={onClose}
+        className="result-close-btn"
         style={{
           position: 'absolute',
           top: '50%',
@@ -46,6 +47,7 @@ export function ResultAlert({ result, onClose, onHide, sectorColor = '#e74c3c' }
       {/* Hide button S (strikethrough) - right */}
       <button
         onClick={onHide}
+        className="result-hide-btn"
         style={{
           position: 'absolute',
           top: '50%',
@@ -77,7 +79,7 @@ export function ResultAlert({ result, onClose, onHide, sectorColor = '#e74c3c' }
         fontWeight: '400',
         color: 'black',
         lineHeight: '40px',
-      }}>
+      }} className="result-text">
         {result}
       </div>
     </div>

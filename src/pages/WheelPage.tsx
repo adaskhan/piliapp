@@ -179,11 +179,25 @@ export function WheelPage() {
 
                 {/* Mobile Controls - сразу под колесом */}
                 <div className="d-block d-lg-none controls text-center mt-3" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                  <div style={{ width: '390px', height: '88px', display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
-                    <Controls
-                      onReset={handleReset}
-                      disabled={visibleItems.length === 0}
-                    />
+                  <div style={{ width: '390px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <div style={{ height: '88px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center' }}>
+                      <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
+                        <Controls
+                          onReset={handleReset}
+                          disabled={visibleItems.length === 0}
+                        />
+                      </div>
+                      {showResultAlert && selectedValue && (
+                        <div id="hide-result-wrapper" style={{ visibility: 'visible', marginTop: '0' }}>
+                          <button
+                            className="btn btn-outline-danger btn-sm"
+                            onClick={handleHideSelected}
+                          >
+                            скрыть <b>{selectedValue}</b>
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>

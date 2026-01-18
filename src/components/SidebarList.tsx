@@ -291,7 +291,7 @@ export function SidebarList({
 
       {/* Divider line when editing */}
       {isEditing && (
-        <div style={{
+        <div className="edit-divider" style={{
           marginTop: '10px',
           marginBottom: '10px',
           borderBottom: '1px solid #ccc'
