@@ -1,0 +1,118 @@
+/* ==========================================
+   Piliapp Wheel - Exact Copy 1:1
+   ========================================== */
+
+body {
+  background: snow;
+}
+
+.pili-wheel-centered {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+#results {
+  padding: 0;
+}
+
+#wheel-wrapper {
+  position: relative;
+  margin: 0 auto;
+}
+
+#wheel, #wheel-bg, #wheel-wrapper {
+  width: 320px;
+  height: 320px;
+}
+
+@media only screen and (min-width: 360px) {
+  #wheel, #wheel-bg, #wheel-wrapper {
+    width: 360px;
+    height: 360px;
+  }
+}
+
+@media only screen and (min-width: 540px) {
+  #wheel, #wheel-bg, #wheel-wrapper {
+    width: 540px;
+    height: 540px;
+  }
+}
+
+#pls-click {
+  position: absolute;
+  text-align: center;
+  z-index: 300;
+  background: #000;
+  opacity: .6;
+  border-radius: 1rem;
+  color: #fff;
+  font-size: 2rem;
+  top: 50%;
+  left: 50%;
+  display: inline-block;
+  padding: 1rem;
+  transform: translate(-50%, -50%);
+  width: 70%;
+  cursor: pointer;
+}
+
+#wheel {
+  cursor: pointer;
+  border-radius: 540px;
+  z-index: 100;
+}
+
+#wheel-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: #000;
+  z-index: 0;
+  box-shadow: 1px 1px 3px 0 rgba(50,50,50,.75);
+  border-radius: 100em;
+}
+
+#wheel-pin {
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  right: 0;
+  color: red;
+  z-index: 100;
+  direction: ltr;
+  height: 1em;
+  line-height: 1em;
+  font-size: 48px;
+  font-family: sans-serif;
+  transform: translateX(30%) translateY(-50%) rotate(90deg) scaleX(.7);
+  text-shadow: 2px -2px 2px #969696;
+  background: transparent;
+}
+
+#wheel-center {
+  cursor: pointer;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 2em;
+  height: 2em;
+  border-radius: 1em;
+  background: #fff;
+  top: 50%;
+  left: 50%;
+  z-index: 100;
+  box-shadow: 1px 1px 3px 0 rgba(50,50,50,.75);
+}
+
+@media only screen and (max-width: 575px) {
+  #wheel-pin {
+    right: 50%;
+    font-size: 36px;
+    transform: translateX(100%) translateY(-50%) rotate(-90deg) scaleX(.65);
+    text-shadow: 0 0 4px #000;
+  }
+  #wheel-center {
+    width: 1.5em;
+    height: 1.5em;
+  }
+}

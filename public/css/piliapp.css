@@ -1,0 +1,528 @@
+/* ==========================================
+   Piliapp Base Styles
+   ========================================== */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  background: snow;
+  color: #212529;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+h1 {
+  font-size: 2.5rem;
+}
+
+/* ==========================================
+   Navbar
+   ========================================== */
+
+.pili-navbar {
+  background: #343a40;
+  padding: 0.5rem 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.pili-nav-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.pili-nav-brand {
+  color: #fff;
+  text-decoration: none;
+  font-size: 1.25rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.pili-nav-links {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.pili-nav-links li a {
+  color: rgba(255,255,255,0.5);
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  display: block;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  border-radius: 0.25rem;
+  transition: background 0.2s;
+}
+
+.pili-nav-links li a:hover,
+.pili-nav-links li a.active {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+}
+
+.pili-nav-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.pili-nav-btn {
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  border-radius: 0.25rem;
+  transition: background 0.2s;
+  text-decoration: none;
+}
+
+.pili-nav-btn:hover {
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+}
+
+/* ==========================================
+   Main Layout
+   ========================================== */
+
+.pili-main-wrapper {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px 15px;
+}
+
+.pili-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr 320px;
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 1199px) {
+  .pili-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pili-center-wheel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.pili-centered-content {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+/* ==========================================
+   Left Ad Column
+   ========================================== */
+
+.pili-left-ad {
+  min-height: 250px;
+}
+
+/* ==========================================
+   Page Title
+   ========================================== */
+
+.pili-page-title {
+  font-size: 2rem;
+  font-weight: 600;
+  text-align: center;
+  margin: 0 0 20px;
+  color: #333;
+  line-height: 1.3;
+  cursor: text;
+  padding: 0 0.5rem;
+  height: 2.5rem;
+  line-height: 2.5rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ==========================================
+   Right Sidebar
+   ========================================== */
+
+.pili-right-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.pili-textarea {
+  width: 100%;
+  min-height: 200px;
+  max-height: 400px;
+  padding: 12px;
+  font-size: 14px;
+  line-height: 18px;
+  font-family: inherit;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: vertical;
+  overflow-y: auto;
+  background: #fff;
+}
+
+.pili-textarea:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.pili-textarea:disabled {
+  background: #f5f5f5;
+  cursor: not-allowed;
+}
+
+/* Control buttons */
+.pili-control-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.pili-btn {
+  flex: 1;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.pili-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pili-btn-start {
+  background: #3498db;
+  color: #fff;
+}
+
+.pili-btn-start:hover:not(:disabled) {
+  background: #2980b9;
+}
+
+.pili-btn-reset {
+  background: #e74c3c;
+  color: #fff;
+}
+
+.pili-btn-reset:hover:not(:disabled) {
+  background: #c0392b;
+}
+
+/* Action buttons */
+.pili-action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pili-action-btn {
+  padding: 8px 14px;
+  font-size: 13px;
+  background: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  color: #555;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pili-action-btn:hover {
+  background: #e9ecef;
+  border-color: #ccc;
+}
+
+/* Hotkeys panel */
+.pili-hotkeys-panel {
+  background: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 12px;
+}
+
+.pili-hotkeys-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #666;
+  margin: 0 0 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pili-hotkey-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid #e8e8e8;
+  font-size: 12px;
+}
+
+.pili-hotkey-item:last-child {
+  border-bottom: none;
+}
+
+.pili-key {
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  padding: 2px 6px;
+  font-family: monospace;
+  font-size: 11px;
+  color: #666;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+/* ==========================================
+   Footer
+   ========================================== */
+
+.pili-footer-categories {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 2px solid #eee;
+}
+
+.pili-footer-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #888;
+  margin: 0 0 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pili-category-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pili-category-btn {
+  padding: 8px 14px;
+  font-size: 13px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  color: #555;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.pili-category-btn:hover {
+  background: #f8f9fa;
+  border-color: #bbb;
+  color: #333;
+}
+
+.pili-category-btn.active {
+  background: #3498db;
+  border-color: #2980b9;
+  color: #fff;
+  text-decoration: none;
+}
+
+/* ==========================================
+   Result Alert
+   ========================================== */
+
+.pili-result-alert {
+  margin: 20px auto;
+  padding: 20px;
+  background: #e8f4fd;
+  border: 1px solid #b8daff;
+  border-radius: 8px;
+  text-align: center;
+  max-width: 600px;
+}
+
+.pili-result-value {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #0066cc;
+  margin: 10px 0;
+}
+
+.pili-result-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 15px;
+}
+
+/* ==========================================
+   Modal
+   ========================================== */
+
+.pili-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 20px;
+}
+
+.pili-modal {
+  background: #fff;
+  border-radius: 6px;
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow: auto;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+}
+
+.pili-modal-header {
+  padding: 15px 20px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pili-modal-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+  color: #333;
+}
+
+.pili-modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #999;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.pili-modal-close:hover {
+  color: #666;
+}
+
+.pili-modal-body {
+  padding: 20px;
+}
+
+.pili-modal-footer {
+  padding: 15px 20px;
+  border-top: 1px solid #eee;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.pili-input {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-family: inherit;
+}
+
+.pili-input:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.pili-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: #555;
+  margin-bottom: 6px;
+}
+
+/* ==========================================
+   Utility Classes
+   ========================================== */
+
+.pili-text-center {
+  text-align: center;
+}
+
+.pili-mb-1 {
+  margin-bottom: 8px;
+}
+
+.pili-mb-2 {
+  margin-bottom: 12px;
+}
+
+.pili-mb-3 {
+  margin-bottom: 16px;
+}
+
+.pili-hidden {
+  display: none !important;
+}
+
+/* ==========================================
+   Responsive
+   ========================================== */
+
+@media (max-width: 767px) {
+  .pili-page-title {
+    font-size: 1.5rem;
+  }
+
+  .pili-control-buttons {
+    flex-direction: column;
+  }
+
+  .pili-btn {
+    width: 100%;
+  }
+}

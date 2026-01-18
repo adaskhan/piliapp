@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Да или Нет? — Колесо фортуны</title>
+    <link rel="stylesheet" href="css/piliapp.css">
+    <link rel="stylesheet" href="css/wheel.css">
+</head>
+<body>
+    <nav class="pili-navbar">
+        <div class="pili-nav-container">
+            <a href="index.html" class="pili-nav-brand">Главная</a>
+            <ul class="pili-nav-links">
+                <li><a href="index.html">Колесо</a></li>
+                <li><a href="yes-no.html" class="active">Да/Нет</a></li>
+                <li><a href="cities.html">Города</a></li>
+                <li><a href="animals.html">Животные</a></li>
+                <li><a href="vegetables.html">Овощи</a></li>
+            </ul>
+            <div class="pili-nav-buttons">
+                <button class="pili-nav-btn" id="fullscreen-btn">Во весь экран</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="pili-main-wrapper">
+        <div class="pili-layout">
+            <div class="pili-left-ad"></div>
+
+            <div class="pili-center-wheel">
+                <h1 class="pili-page-title">Да или Нет?</h1>
+
+                <div id="result-banner" style="display: none;">
+                    <div class="pili-result-alert">
+                        <div id="result-value" class="pili-result-value"></div>
+                        <div class="pili-result-buttons">
+                            <button id="hide-result-btn" class="pili-btn pili-btn-start">Скрыть</button>
+                            <button id="close-result-btn" class="pili-btn pili-btn-reset">Закрыть</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pili-centered-content">
+                    <div id="results">
+                        <div id="wheel-wrapper">
+                            <div id="pls-click">нажмите, чтобы крутить</div>
+                            <span id="test-text" style="font-size: 12px;"></span>
+                            <div id="wheel-bg"></div>
+                            <canvas id="wheel" width="540" height="540"></canvas>
+                            <span id="wheel-center"></span>
+                            <span id="wheel-pin">▼</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pili-right-sidebar">
+                <textarea id="names-list" class="pili-textarea" disabled></textarea>
+
+                <div id="edit-bar">
+                    <button id="edit-btn" class="pili-action-btn">Изменить</button>
+                    <button id="done-btn" class="pili-action-btn" style="display: none;">Закончить</button>
+                    <button id="restore-btn" class="pili-action-btn">Стандартный</button>
+                </div>
+
+                <div class="pili-control-buttons">
+                    <button id="reset-btn" class="pili-btn pili-btn-reset">Сбросить</button>
+                </div>
+
+                <div class="pili-hotkeys-panel">
+                    <div class="pili-hotkeys-title">Горячие клавиши</div>
+                    <div class="pili-hotkey-item"><span><span class="pili-key">SPACE</span> крутить</span></div>
+                    <div class="pili-hotkey-item"><span><span class="pili-key">R</span> Сбросить</span></div>
+                    <div class="pili-hotkey-item"><span><span class="pili-key">E</span> Изменить</span></div>
+                    <div class="pili-hotkey-item"><span><span class="pili-key">F</span> Во весь экран</span></div>
+                    <div class="pili-hotkey-item"><span><span class="pili-key">S</span> Скрыть выбранное</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="pili-footer-categories">
+            <div class="pili-centered-content">
+                <h3 class="pili-footer-title">Другие колеса</h3>
+                <div class="pili-category-buttons">
+                    <a href="index.html" class="pili-category-btn">Колесо По Умолчанию</a>
+                    <a href="yes-no.html" class="pili-category-btn active">Да/Нет</a>
+                    <a href="cities.html" class="pili-category-btn">Города</a>
+                    <a href="animals.html" class="pili-category-btn">Животные</a>
+                    <a href="emojis.html" class="pili-category-btn">Смайлики</a>
+                    <a href="meals.html" class="pili-category-btn">Выбор еды</a>
+                    <a href="fruits.html" class="pili-category-btn">Фрукты</a>
+                    <a href="vegetables.html" class="pili-category-btn">Овощи</a>
+                    <a href="would-you-rather.html" class="pili-category-btn">Что бы ты предпочел?</a>
+                    <a href="never-have-i-ever.html" class="pili-category-btn">Я никогда не...</a>
+                    <a href="two-truths-and-a-lie.html" class="pili-category-btn">Две правды и ложь</a>
+                    <a href="charades-pictionary.html" class="pili-category-btn">Шарады / Пиктограмма</a>
+                    <a href="name-that-tune.html" class="pili-category-btn">Угадай мелодию</a>
+                    <a href="scavenger-hunt.html" class="pili-category-btn">Охота за сокровищами</a>
+                </div>
+            </div>
+        </div>
+
+        <footer style="margin-top: 40px; padding: 20px 0; border-top: 2px solid #eee; text-align: center;">
+            <div style="font-size: 12px; color: #999; margin-bottom: 15px;">
+                <a href="index.html" style="color: #777; text-decoration: none; margin: 0 10px;">Главная</a>
+                |
+                <a href="#" style="color: #777; text-decoration: none; margin: 0 10px;">Конфиденциальность</a>
+                |
+                <a href="#" style="color: #777; text-decoration: none; margin: 0 10px;">Условия использования</a>
+            </div>
+            <p style="font-size: 11px; color: #aaa; margin: 0;">© 2026 Колесо фортуны</p>
+        </footer>
+    </div>
+
+    <script src="js/presets.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/wheel-core.js"></script>
+    <script src="js/page-wheel.js"></script>
+    <script>
+        document.getElementById('fullscreen-btn').addEventListener('click', function() {
+            if (!document.documentElement.requestFullscreen) return;
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        });
+    </script>
+</body>
+</html>
