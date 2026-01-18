@@ -22,7 +22,7 @@ export function Footer({ onCategorySelect }: FooterProps) {
             className="btn btn-outline-secondary btn-sm"
             id="erase-all"
             onClick={handleEraseAll}
-            style={{ width: '150.56px', height: '31px', border: '1px solid #6c757d', backgroundColor: 'transparent', color: '#6c757d', marginTop: '48px' }}
+            style={{ width: '180px', height: '31px', border: '1px solid #6c757d', backgroundColor: 'transparent', color: '#6c757d', marginTop: '48px' }}
           >
             Удалить все данные
           </button>
