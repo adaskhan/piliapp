@@ -21,14 +21,53 @@ export function WheelPage() {
   const [showResultAlert, setShowResultAlert] = useState(false);
   const [hiddenIndices, setHiddenIndices] = useState<number[]>([]);
   const [isSpinning, setIsSpinning] = useState(false);
-  const [editableItems, setEditableItems] = useState<string[]>(category?.items || []);
+  const [editableItems, setEditableItems] = useState<string[]>(() => {
+    // Load from localStorage on initial render
+    const storageKey = slug ? `wheel-items-${slug}` : 'wheel-items-default';
+    const saved = localStorage.getItem(storageKey);
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch {
+        return category?.items || [];
+      }
+    }
+    return category?.items || [];
+  });
 
-  // Update editableItems when category changes
+  // Update editableItems when category changes (only if no saved data)
   useEffect(() => {
-    if (category?.items) {
+    const storageKey = slug ? `wheel-items-${slug}` : 'wheel-items-default';
+    const saved = localStorage.getItem(storageKey);
+    if (!saved && category?.items) {
       setEditableItems(category.items);
     }
-  }, [category]);
+  }, [category, slug]);
+
+  // Save editableItems to localStorage whenever they change
+  useEffect(() => {
+    const storageKey = slug ? `wheel-items-${slug}` : 'wheel-items-default';
+    localStorage.setItem(storageKey, JSON.stringify(editableItems));
+  }, [editableItems, slug]);
+
+  // Save hiddenIndices to localStorage
+  useEffect(() => {
+    const storageKey = slug ? `wheel-hidden-${slug}` : 'wheel-hidden-default';
+    localStorage.setItem(storageKey, JSON.stringify(hiddenIndices));
+  }, [hiddenIndices, slug]);
+
+  // Load hiddenIndices from localStorage on mount
+  useEffect(() => {
+    const storageKey = slug ? `wheel-hidden-${slug}` : 'wheel-hidden-default';
+    const saved = localStorage.getItem(storageKey);
+    if (saved) {
+      try {
+        setHiddenIndices(JSON.parse(saved));
+      } catch {
+        // Ignore invalid data
+      }
+    }
+  }, [slug]);
 
   const items = editableItems;
   const title = category?.heading || category?.name || 'Колесо';
@@ -63,6 +102,7 @@ export function WheelPage() {
 
   const handleCategorySelect = useCallback((items: string[], categoryName: string) => {
     setEditableItems(items);
+    setHiddenIndices([]); // Reset hidden indices when changing category
     setSelectedIndex(undefined);
     setSelectedValue(undefined);
     setShowResultAlert(false);

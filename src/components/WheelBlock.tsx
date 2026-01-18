@@ -180,13 +180,22 @@ export default function WheelBlock({
         // Normalize angle to 0-360 range
         const normalizedAngle = newAngle % 360;
 
-        // Pointer is at top, which corresponds to angle 0 in wheel coordinates
-        // When wheel rotates clockwise by angle degrees, the sector at position:
-        // (360 - angle % 360) % 360 is at the top
-        const effectiveAngle = (360 - (normalizedAngle % 360)) % 360;
+        // Wheel start angle in degrees: Math.PI - 0.4 radians = 180° - 22.92° ≈ 157.08°
+        const wheelStartAngle = 180 - (0.4 * 180 / Math.PI);
+        const pointerAngle = 270; // Top position
 
-        // Each sector covers 360/N degrees
-        const selectedIndex = Math.floor(effectiveAngle / sectorAngle) % N;
+        // Effective wheel angle after rotation
+        const wheelAngle = (wheelStartAngle + normalizedAngle) % 360;
+
+        // Angle from wheel start to pointer
+        let angleFromStart = (pointerAngle - wheelAngle) % 360;
+        if (angleFromStart < 0) angleFromStart += 360;
+
+        // Calculate which sector is at the pointer
+        let selectedIndex = Math.floor(angleFromStart / sectorAngle) % N;
+
+        // Apply offset correction to match visual wheel
+        selectedIndex = (selectedIndex + 2) % N;
 
         if (setSelectedIndex) setSelectedIndex(selectedIndex);
         if (setSelectedValue) setSelectedValue(visibleItems[selectedIndex]);
