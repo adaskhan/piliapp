@@ -15,6 +15,9 @@ interface SidebarListProps {
   onCategorySelect?: (items: string[], categoryName: string) => void;
   onHideModeChange?: (isHiding: boolean) => void;
   isSpinning?: boolean;
+  spinMode?: 'random' | 'selected';
+  onWinnerSelect?: (index: number | null) => void;
+  selectedWinnerIndex?: number | null;
 }
 
 export function SidebarList({
@@ -30,11 +33,15 @@ export function SidebarList({
   onCategorySelect,
   onHideModeChange,
   isSpinning = false,
+  spinMode = 'random',
+  onWinnerSelect,
+  selectedWinnerIndex,
 }: SidebarListProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const isExternalUpdateRef = useRef(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isHidingMode, setIsHidingMode] = useState(false);
+  const [isSelectMode, setIsSelectMode] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [textareaValue, setTextareaValue] = useState('');
 
@@ -62,6 +69,7 @@ export function SidebarList({
     setTextareaValue(items.join('\n'));
     setIsEditing(true);
     setIsHidingMode(false);
+    setIsSelectMode(false);
     // Focus textarea after a small delay to ensure it's rendered
     setTimeout(() => {
       if (textareaRef.current) {
@@ -74,11 +82,17 @@ export function SidebarList({
     // Just exit editing mode - changes are already applied in real-time via handleChange
     setIsEditing(false);
     setIsHidingMode(false);
+    setIsSelectMode(false);
+  };
+
+  const handleToggleSelectMode = () => {
+    setIsSelectMode(!isSelectMode);
   };
 
   const handleHideMode = () => {
     setIsHidingMode(true);
     setIsEditing(false);
+    setIsSelectMode(false);
   };
 
   const handleResetHidden = () => {
@@ -90,6 +104,7 @@ export function SidebarList({
       setTextareaValue(items.join('\n'));
       setIsEditing(true);
       setIsHidingMode(false);
+      setIsSelectMode(false);
     }
   };
 
@@ -104,6 +119,7 @@ export function SidebarList({
     if (forceEditMode) {
       setIsEditing(true);
       setIsHidingMode(false);
+      setIsSelectMode(false);
     }
   }, [forceEditMode]);
 
@@ -112,6 +128,7 @@ export function SidebarList({
     if (forceHideMode) {
       setIsHidingMode(true);
       setIsEditing(false);
+      setIsSelectMode(false);
     }
   }, [forceHideMode]);
 
@@ -153,7 +170,7 @@ export function SidebarList({
         placeholder="Пожалуйста, введите здесь имена людей и отделите их другой строкой."
         className="names"
         style={{
-          display: isEditing && !isHidingMode ? 'block' : 'none',
+          display: isEditing && !isSelectMode ? 'block' : 'none',
           width: '310px',
           height: '384.39px',
         }}
@@ -161,7 +178,7 @@ export function SidebarList({
         onChange={handleChange}
         onKeyDown={handleKeyDown}
         disabled={disabled}
-        autoFocus={isEditing && !isHidingMode}
+        autoFocus={isEditing && !isSelectMode}
       />
 
       {/* Names show - displayed when not editing */}
@@ -169,12 +186,46 @@ export function SidebarList({
         id="names-show"
         className="names"
         style={{ display: !isEditing && !isHidingMode ? 'block' : 'none' }}
-        onClick={handleEditClick}
+        onClick={spinMode === 'random' ? handleEditClick : undefined}
       >
         {items.map((item, index) => {
           const isHidden = hiddenIndices.includes(index);
+
           return (
             <div key={index} className={isHidden ? 'strike' : ''}>
+              {item}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Names select - for selecting winner (inside editing mode) */}
+      <div
+        id="names-select"
+        className="names"
+        style={{ display: isEditing && isSelectMode ? 'block' : 'none' }}
+      >
+        <div style={{ fontSize: '12px', color: '#666', marginBottom: '8px', textAlign: 'center' }}>
+          Нажмите на элемент чтобы выбрать его для режима S
+        </div>
+        {items.map((item, index) => {
+          const isHidden = hiddenIndices.includes(index);
+          return (
+            <div
+              key={index}
+              className={isHidden ? 'strike' : ''}
+              style={{
+                cursor: isHidden ? 'default' : 'pointer',
+                padding: '2px 4px',
+                borderRadius: '3px',
+              }}
+              onClick={() => {
+                if (!isHidden) {
+                  onWinnerSelect?.(index);
+                  setIsSelectMode(false);
+                }
+              }}
+            >
               {item}
             </div>
           );
@@ -214,7 +265,7 @@ export function SidebarList({
       {/* Edit bar */}
       {!isSpinning && (
       <div id="edit-bar" style={{ visibility: 'visible', marginTop: '6px', display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'space-between' }}>
-        {!isEditing && (
+        {!isEditing && !isHidingMode && !isSelectMode && (
           <>
             <button
               id="edit-title"
@@ -236,13 +287,24 @@ export function SidebarList({
           </>
         )}
         {isEditing && (
-          <button
-            className="btn btn-outline-secondary btn-sm"
-            onClick={handleFinish}
-            style={{ width: '89.11px', height: '31px' }}
-          >
-            Закончить
-          </button>
+          <>
+            {spinMode === 'selected' && (
+              <button
+                className="btn btn-outline-secondary btn-sm"
+                onClick={handleToggleSelectMode}
+                style={{ width: '80px', height: '31px' }}
+              >
+                {isSelectMode ? '← Назад' : 'Выбрать'}
+              </button>
+            )}
+            <button
+              className="btn btn-outline-secondary btn-sm"
+              onClick={handleFinish}
+              style={{ width: '89.11px', height: '31px' }}
+            >
+              Закончить
+            </button>
+          </>
         )}
         {isHidingMode && (
           <button
@@ -253,7 +315,7 @@ export function SidebarList({
             Закончить
           </button>
         )}
-        {!isEditing && !isHidingMode && (
+        {!isEditing && !isHidingMode && !isSelectMode && (
           <button
             title="редактировать скрытые элементы в списке"
             className="btn btn-outline-secondary btn-sm"
@@ -264,7 +326,7 @@ export function SidebarList({
             скрывать...
           </button>
         )}
-        {hasHiddenItems && !isEditing && (
+        {hasHiddenItems && !isEditing && !isHidingMode && !isSelectMode && (
           <button
             id="strike-reset"
             title="показать все скрытые предметы"

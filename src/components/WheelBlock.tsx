@@ -1,6 +1,26 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { playTickSound, playWinSound } from "../utils/sound";
+import { playTick, playWin } from "../utils/audio";
 import "../styles/piliapp-wheel.css";
+
+// Helper: get which sector is under the pointer (right side, angle 0)
+function getSectorAtPointer(angleRad: number, itemCount: number): number {
+  const sectorAngle = (2 * Math.PI) / itemCount;
+  const normalized = ((angleRad % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+
+  // drawWheel starts at (Math.PI - 0.4), so we need this offset
+  const startOffset = Math.PI - 0.4;
+
+  // Transfer angle so "sector 0" aligns with wheel start
+  const rel = (startOffset + normalized) % (2 * Math.PI);
+
+  // Pointer is at right side (angle 0)
+  const pointer = 0;
+
+  let fromStart = (pointer - rel) % (2 * Math.PI);
+  if (fromStart < 0) fromStart += 2 * Math.PI;
+
+  return Math.floor(fromStart / sectorAngle) % itemCount;
+}
 
 const COLORS = [
   "#98FB98", // Pale Green
@@ -54,10 +74,14 @@ interface WheelBlockProps {
   selectedIndex?: number;
   setSelectedIndex?: (index: number) => void;
   setSelectedValue?: (value: string) => void;
+  setSelectedColor?: (color: string) => void;
   setShowResultAlert?: (show: boolean) => void;
   hiddenIndices?: number[];
   onHiddenIndicesChange?: (indices: number[]) => void;
   onSpinningChange?: (isSpinning: boolean) => void;
+  soundEnabled?: boolean;
+  spinMode?: 'random' | 'selected';
+  selectedWinnerIndex?: number | null;
 }
 
 export default function WheelBlock({
@@ -66,14 +90,20 @@ export default function WheelBlock({
   selectedIndex,
   setSelectedIndex,
   setSelectedValue,
+  setSelectedColor,
   setShowResultAlert,
   hiddenIndices = [],
   onHiddenIndicesChange,
   onSpinningChange,
+  soundEnabled = true,
+  spinMode = 'random',
+  selectedWinnerIndex = null,
 }: WheelBlockProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [angle, setAngle] = useState(0);
   const [isSpinning, setIsSpinning] = useState(false);
+  const lastSectorRef = useRef<number>(-1);
+  const lastTickTimeRef = useRef<number>(0);
 
   // Notify parent when spinning state changes
   useEffect(() => {
@@ -170,6 +200,38 @@ export default function WheelBlock({
     return Math.floor(angleFromStart / stepDeg) % itemCount;
   }
 
+  // Calculate the base angle (0-360) needed to position targetIndex at pointer
+  function calcTargetBaseAngle(targetIndex: number, itemCount: number): number {
+    const sectorAngle = 360 / itemCount;
+    const startOffsetDeg = (Math.PI - 0.4) * 180 / Math.PI; // ≈ 157.08°
+
+    // Sector center position (where pointer should land)
+    const sectorCenterPos = (startOffsetDeg + targetIndex * sectorAngle + sectorAngle / 2) % 360;
+
+    // To position sectorCenterPos at pointer (0deg), we need:
+    // (sectorCenterPos + finalAngle) % 360 = 0
+    // finalAngle % 360 = -sectorCenterPos % 360
+    const targetAngle = (-sectorCenterPos) % 360;
+    return targetAngle >= 0 ? targetAngle : targetAngle + 360;
+  }
+
+  // Map items index to visibleItems index (supports duplicates)
+  function getVisibleIndex(itemsIndex: number): number | null {
+    if (itemsIndex < 0 || itemsIndex >= items.length) return null;
+
+    // Create mapping: for each visible item, store its original index
+    const visibleMapping: number[] = [];
+    items.forEach((_item, idx) => {
+      if (!hiddenIndices.includes(idx)) {
+        visibleMapping.push(idx);
+      }
+    });
+
+    // Find the visibleIndex where original index matches itemsIndex
+    const visibleIndex = visibleMapping.indexOf(itemsIndex);
+    return visibleIndex !== -1 ? visibleIndex : null;
+  }
+
   const spin = () => {
     if (isSpinning) return; // Prevent spinning while already spinning
 
@@ -179,25 +241,56 @@ export default function WheelBlock({
     const N = visibleItems.length;
     if (N === 0) return;
 
-    const deg = 360 * (8 + Math.random() * 4) + Math.random() * 360;
+    // Calculate rotation based on mode
+    let targetIndex: number;
+
+    if (spinMode === 'selected' && selectedWinnerIndex !== null) {
+      // S mode: use pre-selected winner
+      const visibleIdx = getVisibleIndex(selectedWinnerIndex);
+
+      if (visibleIdx !== null) {
+        targetIndex = visibleIdx;
+      } else {
+        // Selected item is hidden, fall back to random
+        targetIndex = Math.floor(Math.random() * N);
+      }
+    } else {
+      // R mode: random winner
+      targetIndex = Math.floor(Math.random() * N);
+    }
+
+    // Calculate final angle using proper formula with long spin UX
+    const targetBaseAngle = calcTargetBaseAngle(targetIndex, N);
+    const currentAngleMod = angle % 360;
+
+    // Calculate delta to reach target (0-360)
+    let delta = (targetBaseAngle - currentAngleMod) % 360;
+    if (delta < 0) delta += 360;
+
+    // Add 8-12 full rotations for UX (like piliapp)
+    const rotations = 360 * (8 + Math.floor(Math.random() * 5));
+
+    const newAngle = angle + delta + rotations;
     const startAngle = angle;
-    const newAngle = angle + deg;
-    const sectorAngle = 360 / N;
+    const deg = newAngle - startAngle;
 
     setAngle(newAngle);
     setIsSpinning(true);
+    lastSectorRef.current = getSectorAtPointer((startAngle * Math.PI) / 180, N);
+    lastTickTimeRef.current = 0; // Reset tick timer
 
     const duration = 10000; // 10 seconds
     const startTime = performance.now();
-    let lastTickAngle = startAngle;
 
-    // Synchronized tick sounds with wheel rotation
+    // Synchronized tick sounds with wheel rotation - by sector!
     const animate = (currentTime: number) => {
       const elapsed = currentTime - startTime;
 
       if (elapsed >= duration) {
         // Spin complete - play win sound and show result
-        playWinSound();
+        if (soundEnabled) {
+          playWin();
+        }
 
         // Calculate selected index using the proper function
         const finalAngleDeg = newAngle % 360;
@@ -205,6 +298,7 @@ export default function WheelBlock({
 
         if (setSelectedIndex) setSelectedIndex(selectedIndex);
         if (setSelectedValue) setSelectedValue(visibleItems[selectedIndex]);
+        if (setSelectedColor) setSelectedColor(sectorColors[selectedIndex]);
         if (setShowResultAlert) setShowResultAlert(true);
         setIsSpinning(false);
         return;
@@ -213,14 +307,22 @@ export default function WheelBlock({
       // Calculate current rotation angle using the same easing as CSS
       const progress = getEasedProgress(elapsed, duration);
       const currentAngle = startAngle + (deg * progress);
+      const currentAngleRad = (currentAngle * Math.PI) / 180;
 
-      // Check if a sector boundary has crossed the right pointer (0 degrees)
-      // Play tick every 90 degrees to avoid too many ticks at start
-      const tickAngle = 90;
-      const angleDiff = currentAngle - lastTickAngle;
-      if (angleDiff >= tickAngle) {
-        playTickSound();
-        lastTickAngle = currentAngle - (currentAngle % tickAngle);
+      // Play tick sound when sector boundary crosses pointer
+      // Throttled to avoid too many ticks during fast rotation
+      if (soundEnabled) {
+        const sectorIndex = getSectorAtPointer(currentAngleRad, N);
+        const now = currentTime;
+        const minTickInterval = 80; // minimum 80ms between ticks
+
+        if (sectorIndex !== lastSectorRef.current) {
+          if (now - lastTickTimeRef.current >= minTickInterval) {
+            playTick();
+            lastTickTimeRef.current = now;
+          }
+          lastSectorRef.current = sectorIndex;
+        }
       }
 
       requestAnimationFrame(animate);
@@ -234,7 +336,7 @@ export default function WheelBlock({
     const handleSpinEvent = () => spin();
     window.addEventListener('spin-wheel', handleSpinEvent);
     return () => window.removeEventListener('spin-wheel', handleSpinEvent);
-  }, [visibleItems, angle, isSpinning, setSelectedIndex, setSelectedValue, setShowResultAlert]);
+  }, [visibleItems, angle, isSpinning, soundEnabled, spinMode, selectedWinnerIndex, setSelectedIndex, setSelectedValue, setShowResultAlert]);
 
   return (
     <>

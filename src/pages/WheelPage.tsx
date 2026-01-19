@@ -8,7 +8,7 @@ import { Controls } from '../components/Controls';
 import { ResultAlert } from '../components/ResultAlert';
 import { Footer } from '../components/Footer';
 import { useHotkeys } from '../hooks/useHotkeys';
-import { getColor } from '../utils/wheelColors';
+import { isSoundEnabled, setSoundEnabled } from '../utils/audio';
 import type { HotkeyAction } from '../types';
 import '../styles/piliapp.css';
 
@@ -18,9 +18,16 @@ export function WheelPage() {
 
   const [selectedIndex, setSelectedIndex] = useState<number | undefined>();
   const [selectedValue, setSelectedValue] = useState<string | undefined>();
+  const [selectedColor, setSelectedColor] = useState<string>('#e74c3c');
   const [showResultAlert, setShowResultAlert] = useState(false);
   const [hiddenIndices, setHiddenIndices] = useState<number[]>([]);
   const [isSpinning, setIsSpinning] = useState(false);
+  const [soundEnabled, setSoundEnabledState] = useState(() => {
+    const stored = localStorage.getItem('wheelSoundEnabled');
+    return stored ? JSON.parse(stored) : true;
+  });
+  const [spinMode, setSpinMode] = useState<'random' | 'selected'>('random');
+  const [selectedWinnerIndex, setSelectedWinnerIndex] = useState<number | null>(null);
   const [editableItems, setEditableItems] = useState<string[]>(() => {
     // Load from localStorage on initial render
     const storageKey = slug ? `wheel-items-${slug}` : 'wheel-items-default';
@@ -34,6 +41,13 @@ export function WheelPage() {
     }
     return category?.items || [];
   });
+
+  // Handle sound enabled change
+  const handleSoundEnabledChange = useCallback((enabled: boolean) => {
+    setSoundEnabledState(enabled);
+    setSoundEnabled(enabled);
+    localStorage.setItem('wheelSoundEnabled', JSON.stringify(enabled));
+  }, []);
 
   // Update editableItems when category changes (only if no saved data)
   useEffect(() => {
@@ -198,7 +212,7 @@ export function WheelPage() {
                     result={selectedValue}
                     onClose={handleCloseResultAlert}
                     onHide={handleHideSelected}
-                    sectorColor={getColor(selectedIndex || 0)}
+                    sectorColor={selectedColor}
                   />
                 </div>
               ) : (
@@ -213,6 +227,11 @@ export function WheelPage() {
                   <Controls
                     onReset={handleReset}
                     disabled={visibleItems.length === 0}
+                    spinMode={spinMode}
+                    onSpinModeChange={setSpinMode}
+                    selectedIndex={selectedWinnerIndex}
+                    onSelectedIndexChange={setSelectedWinnerIndex}
+                    items={items}
                   />
                 </div>
               </div>
@@ -229,10 +248,14 @@ export function WheelPage() {
                   selectedIndex={selectedIndex}
                   setSelectedIndex={setSelectedIndex}
                   setSelectedValue={setSelectedValue}
+                  setSelectedColor={setSelectedColor}
                   setShowResultAlert={setShowResultAlert}
                   hiddenIndices={hiddenIndices}
                   onHiddenIndicesChange={setHiddenIndices}
                   onSpinningChange={setIsSpinning}
+                  soundEnabled={soundEnabled}
+                  spinMode={spinMode}
+                  selectedWinnerIndex={selectedWinnerIndex}
                 />
 
                 {/* Mobile Controls - сразу под колесом */}
@@ -243,6 +266,11 @@ export function WheelPage() {
                         <Controls
                           onReset={handleReset}
                           disabled={visibleItems.length === 0}
+                          spinMode={spinMode}
+                          onSpinModeChange={setSpinMode}
+                          selectedIndex={selectedWinnerIndex}
+                          onSelectedIndexChange={setSelectedWinnerIndex}
+                          items={items}
                         />
                       </div>
                       {showResultAlert && selectedValue && (
@@ -275,6 +303,9 @@ export function WheelPage() {
                   forceHideMode={false}
                   onCategorySelect={handleCategorySelect}
                   isSpinning={isSpinning}
+                  spinMode={spinMode}
+                  onWinnerSelect={setSelectedWinnerIndex}
+                  selectedWinnerIndex={selectedWinnerIndex}
                 />
               </div>
             </div>

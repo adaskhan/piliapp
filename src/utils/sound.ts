@@ -1,66 +1,86 @@
-// Basic sound generator for wheel
-let audioContext: AudioContext | null = null;
+// Audio engine for wheel - Web Audio API (no audio files)
+let audioCtx: AudioContext | null = null;
 
-// Initialize audio context (required for Web Audio API)
-function getAudioContext(): AudioContext {
-  if (!audioContext) {
-    audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+export function initAudio() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
   }
-  if (audioContext.state === 'suspended') {
-    audioContext.resume();
+  return audioCtx;
+}
+
+export async function resumeAudio() {
+  const ctx = initAudio();
+  if (ctx.state === "suspended") {
+    await ctx.resume();
   }
-  return audioContext;
+}
+
+function createClick({
+  freq = 220,
+  type = "triangle",
+  gain = 0.14,
+  duration = 0.06,
+}: {
+  freq?: number;
+  type?: OscillatorType;
+  gain?: number;
+  duration?: number;
+}) {
+  const ctx = initAudio();
+  const osc = ctx.createOscillator();
+  const g = ctx.createGain();
+
+  osc.type = type;
+  osc.frequency.value = freq;
+
+  g.gain.setValueAtTime(gain, ctx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+
+  osc.connect(g);
+  g.connect(ctx.destination);
+
+  osc.start();
+  osc.stop(ctx.currentTime + duration);
 }
 
 /**
- * Play tick sound - simple click
+ * Play tick sound - piliapp-like soft click when sector boundary crosses pointer
  */
-export function playTickSound(): void {
-  const ctx = getAudioContext();
-  const oscillator = ctx.createOscillator();
-  const gainNode = ctx.createGain();
-
-  oscillator.connect(gainNode);
-  gainNode.connect(ctx.destination);
-
-  oscillator.type = 'square';
-  oscillator.frequency.value = 200;
-
-  gainNode.gain.setValueAtTime(0.1, ctx.currentTime);
-  gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.02);
-
-  oscillator.start(ctx.currentTime);
-  oscillator.stop(ctx.currentTime + 0.02);
+export function playTickSound() {
+  if (!audioCtx) initAudio();
+  // piliapp-like мягкий щелчок
+  createClick({
+    freq: 200 + Math.random() * 40,
+    type: "triangle",
+    gain: 0.12,
+    duration: 0.07,
+  });
 }
 
 /**
- * Play win sound - celebrates when wheel stops
+ * Play win sound - short "ding" on stop
  */
-export function playWinSound(): void {
-  const ctx = getAudioContext();
-  const now = ctx.currentTime;
+export function playWinSound() {
+  const ctx = initAudio();
 
-  const playNote = (freq: number, startTime: number, duration: number, type: OscillatorType = 'sine') => {
-    const oscillator = ctx.createOscillator();
-    const gainNode = ctx.createGain();
+  const osc1 = ctx.createOscillator();
+  const osc2 = ctx.createOscillator();
+  const g = ctx.createGain();
 
-    oscillator.connect(gainNode);
-    gainNode.connect(ctx.destination);
+  osc1.type = "sine";
+  osc2.type = "triangle";
+  osc1.frequency.value = 880;
+  osc2.frequency.value = 1320;
 
-    oscillator.type = type;
-    oscillator.frequency.setValueAtTime(freq, startTime);
+  g.gain.setValueAtTime(0.18, ctx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.22);
 
-    gainNode.gain.setValueAtTime(0, startTime);
-    gainNode.gain.linearRampToValueAtTime(0.25, startTime + 0.02);
-    gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+  osc1.connect(g);
+  osc2.connect(g);
+  g.connect(ctx.destination);
 
-    oscillator.start(startTime);
-    oscillator.stop(startTime + duration);
-  };
-
-  // Play a cheerful major chord arpeggio
-  playNote(261.63, now, 0.3, 'sine');           // C4
-  playNote(329.63, now + 0.15, 0.3, 'sine');     // E4
-  playNote(392.00, now + 0.3, 0.4, 'sine');     // G4
-  playNote(523.25, now + 0.5, 0.5, 'sine');     // C5
+  osc1.start();
+  osc2.start();
+  osc1.stop(ctx.currentTime + 0.22);
+  osc2.stop(ctx.currentTime + 0.22);
 }
