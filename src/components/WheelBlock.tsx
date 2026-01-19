@@ -3,27 +3,27 @@ import { playTickSound, playWinSound } from "../utils/sound";
 import "../styles/piliapp-wheel.css";
 
 const COLORS = [
-  "#2F6BFF", // синий / royalblue
-  "#FF7B6E", // красно-коралловый / salmon
-  "#7CFF7A", // салатовый/зелёный / palegreen
-  "#E6B9FF", // сиреневый / plum
-  "#F6E7B2", // бежевый/песочный / wheat
+  "#98FB98", // Pale Green
+  "#FA8072", // Salmon
+  "#4169E1", // Royal Blue
+  "#F5DEB3", // Wheat
+  "#DDA0DD", // Plum
 ];
 
 // Special colors for default wheel (12 elements: "1".."12") - matches piliapp exactly
 const DEFAULT_WHEEL_COLORS = [
-  "#2F6BFF", // 1: royalblue
-  "#FF7B6E", // 2: salmon
-  "#7CFF7A", // 3: palegreen
-  "#F6E7B2", // 4: wheat
-  "#E6B9FF", // 5: plum
-  "#2F6BFF", // 6: royalblue
-  "#FF7B6E", // 7: salmon
-  "#7CFF7A", // 8: palegreen
-  "#F6E7B2", // 9: wheat
-  "#E6B9FF", // 10: plum
-  "#7CFF7A", // 11: palegreen
-  "#F6E7B2", // 12: wheat
+  "#98FB98", // 1: Pale Green
+  "#FA8072", // 2: Salmon
+  "#4169E1", // 3: Royal Blue
+  "#F5DEB3", // 4: Wheat
+  "#DDA0DD", // 5: Plum
+  "#98FB98", // 6: Pale Green
+  "#FA8072", // 7: Salmon
+  "#4169E1", // 8: Royal Blue
+  "#F5DEB3", // 9: Wheat
+  "#DDA0DD", // 10: Plum
+  "#4169E1", // 11: Royal Blue
+  "#F5DEB3", // 12: Wheat
 ];
 
 // Cubic bezier easing function matching CSS cubic-bezier(0.6, 0, 0, 1)
@@ -148,6 +148,28 @@ export default function WheelBlock({
     drawWheel(ctx, cssSize, visibleItems, sectorColors);
   }, [visibleItems, sectorColors]);
 
+  // Function to get the selected index based on final angle
+  function getSelectedIndex(finalAngleDeg: number, itemCount: number): number {
+    const stepDeg = 360 / itemCount;
+
+    // drawWheel uses: start = i * step + Math.PI - 0.4
+    const startOffsetRad = Math.PI - 0.4;
+    const startOffsetDeg = startOffsetRad * 180 / Math.PI; // ≈ 157.08°
+
+    // Pointer is at right side (3 o'clock, angle 0)
+    const pointerDeg = 0;
+
+    // Effective wheel angle after CSS rotation
+    const wheelDeg = (startOffsetDeg + finalAngleDeg) % 360;
+
+    // Angle from wheel start to pointer
+    let angleFromStart = (pointerDeg - wheelDeg) % 360;
+    if (angleFromStart < 0) angleFromStart += 360;
+
+    // Which sector is under pointer
+    return Math.floor(angleFromStart / stepDeg) % itemCount;
+  }
+
   const spin = () => {
     if (isSpinning) return; // Prevent spinning while already spinning
 
@@ -177,25 +199,9 @@ export default function WheelBlock({
         // Spin complete - play win sound and show result
         playWinSound();
 
-        // Normalize angle to 0-360 range
-        const normalizedAngle = newAngle % 360;
-
-        // Wheel start angle in degrees: Math.PI - 0.4 radians = 180° - 22.92° ≈ 157.08°
-        const wheelStartAngle = 180 - (0.4 * 180 / Math.PI);
-        const pointerAngle = 270; // Top position
-
-        // Effective wheel angle after rotation
-        const wheelAngle = (wheelStartAngle + normalizedAngle) % 360;
-
-        // Angle from wheel start to pointer
-        let angleFromStart = (pointerAngle - wheelAngle) % 360;
-        if (angleFromStart < 0) angleFromStart += 360;
-
-        // Calculate which sector is at the pointer
-        let selectedIndex = Math.floor(angleFromStart / sectorAngle) % N;
-
-        // Apply offset correction to match visual wheel
-        selectedIndex = (selectedIndex + 2) % N;
+        // Calculate selected index using the proper function
+        const finalAngleDeg = newAngle % 360;
+        const selectedIndex = getSelectedIndex(finalAngleDeg, N);
 
         if (setSelectedIndex) setSelectedIndex(selectedIndex);
         if (setSelectedValue) setSelectedValue(visibleItems[selectedIndex]);
@@ -208,7 +214,7 @@ export default function WheelBlock({
       const progress = getEasedProgress(elapsed, duration);
       const currentAngle = startAngle + (deg * progress);
 
-      // Check if a sector boundary has crossed the top pointer (270 degrees)
+      // Check if a sector boundary has crossed the right pointer (0 degrees)
       // Play tick every 90 degrees to avoid too many ticks at start
       const tickAngle = 90;
       const angleDiff = currentAngle - lastTickAngle;

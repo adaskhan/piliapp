@@ -153,7 +153,7 @@ export function WheelCanvas({ items, angle, isSpinning, onSpin, onSpinStart }: W
 
   // Prepare data attributes for canvas
   const dataNames = JSON.stringify(items.map(String));
-  const colorNames = ['royalblue', 'salmon', 'palegreen', 'wheat', 'plum'];
+  const colorNames = ['palegreen', 'salmon', 'royalblue', 'wheat', 'plum'];
   const dataColors = JSON.stringify(items.map((_, i) => colorNames[i % colorNames.length]));
 
   return (

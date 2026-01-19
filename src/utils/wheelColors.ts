@@ -1,10 +1,10 @@
 // Palette colors matching wheel block
 export const WHEEL_COLORS = [
-  "#2F6BFF", // синий
-  "#FF7B6E", // красно-коралловый
-  "#7CFF7A", // салатовый/зелёный
-  "#E6B9FF", // сиреневый
-  "#F6E7B2", // бежевый/песочный
+  "#98FB98", // Pale Green
+  "#FA8072", // Salmon
+  "#4169E1", // Royal Blue
+  "#F5DEB3", // Wheat
+  "#DDA0DD", // Plum
 ];
 
 export function getColor(index: number): string {
