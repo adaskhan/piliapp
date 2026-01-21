@@ -338,6 +338,46 @@ export default function WheelBlock({
     return () => window.removeEventListener('spin-wheel', handleSpinEvent);
   }, [visibleItems, angle, isSpinning, soundEnabled, spinMode, selectedWinnerIndex, setSelectedIndex, setSelectedValue, setShowResultAlert]);
 
+  // Show warning when no items
+  if (visibleItems.length === 0) {
+    return (
+      <div id="wheel-wrapper" className="warning">
+        <div className="warning-text" style={{ display: 'none' }}>
+          В списке слишком много элементов. Не может превышать 100 элементов.
+        </div>
+        <div className="warning-text" style={{}}>
+          Пожалуйста, войдите в список
+          <div className="arrow-to-list d-none d-xl-block">→ → → </div>
+          <div className="arrow-to-list d-block d-xl-none">↓ ↓ ↓</div>
+        </div>
+        <div className="warning-text" style={{ display: 'none' }}>
+          Вы хотите сбросить настройки?
+          <br />
+          <input type="button" value="Сбросить" className="btn btn-danger btn-lg" />
+        </div>
+        <div id="pls-click" style={{ display: 'none' }}>
+          нажмите, чтобы крутить
+        </div>
+        <span id="test-text" style={{ fontSize: '12px' }}></span>
+        <div id="wheel-bg" style={{ display: 'none' }}></div>
+        <canvas
+          id="wheel"
+          ref={canvasRef}
+          data-names={JSON.stringify(items)}
+          data-colors={JSON.stringify(sectorColors)}
+          style={{
+            transform: `rotate(${angle}deg)`,
+            transitionDuration: "10s",
+            transitionTimingFunction: "cubic-bezier(0.6, 0, 0, 1)",
+            display: 'none',
+          }}
+        />
+        <span id="wheel-center" style={{ display: 'none' }}></span>
+        <span id="wheel-pin" style={{ display: 'none' }}>▼</span>
+      </div>
+    );
+  }
+
   return (
     <>
       <div id="wheel-wrapper">
@@ -379,10 +419,18 @@ function drawWheel(
   // Находим самый длинный текст
   const maxLength = Math.max(...names.map(n => n.length));
 
-  // Определяем отступ от края для текста (для Да/Нет и Колеса По Умолчанию - больше отступ)
-  const isYesNo = N === 10 && names.every(n => n === 'Да' || n === 'Нет');
-  const isDefaultWheel = N === 12 && names.every(n => /^\d+$/.test(n));
-  const textMargin = (isYesNo || isDefaultWheel) ? 20 : 8;
+  // Определяем отступ от края для текста (динамический: чем больше элементов, тем меньше отступ)
+  let textMargin = 20;
+  if (N <= 6) textMargin = 25;
+  else if (N <= 10) textMargin = 20;
+  else if (N <= 15) textMargin = 18;
+  else if (N <= 20) textMargin = 15;
+  else if (N <= 30) textMargin = 13;
+  else if (N <= 50) textMargin = 10;
+  else textMargin = 8;
+
+  // Определяем является ли колесо полностью цифровым (для размера шрифта)
+  const isAllNumbers = N > 0 && names.every(n => /^\d+$/.test(n));
 
   // Динамический размер шрифта в зависимости от количества элементов И длины текста
   let fontSize = 48;
@@ -418,6 +466,39 @@ function drawWheel(
     else if (maxLength > 30) fontSize = 32;
     else if (maxLength > 20) fontSize = 42;
     else fontSize = 56;
+  }
+
+  // Для цифровых колёс увеличиваем размер шрифта (с учетом длины цифр)
+  if (isAllNumbers) {
+    if (N <= 2) {
+      // 2-6 элементов - большие цифры
+      if (maxLength <= 2) fontSize = 130;  // короткие цифры (1-99)
+      else if (maxLength <= 3) fontSize = 90;  // средние цифры (100-999)
+      else if (maxLength <= 4) fontSize = 70;  // длинные цифры (1000-9999)
+    }
+    else if (N <= 3) {
+      // 2-6 элементов - большие цифры
+      if (maxLength <= 2) fontSize = 90;  // короткие цифры (1-99)
+      else if (maxLength <= 3) fontSize = 80;  // средние цифры (100-999)
+      else if (maxLength <= 4) fontSize = 70;  // длинные цифры (1000-9999)
+    }
+    else if (N <= 6) {
+      // 2-6 элементов - большие цифры
+      if (maxLength <= 2) fontSize = 80;  // короткие цифры (1-99)
+      else if (maxLength <= 3) fontSize = 70;  // средние цифры (100-999)
+      else if (maxLength <= 4) fontSize = 60;  // длинные цифры (1000-9999)
+    }
+    else if (N <= 15) {
+      // 7-15 элементов
+      if (maxLength <= 2) fontSize = 65;
+      else if (maxLength <= 3) fontSize = 58;
+      else if (maxLength <= 4) fontSize = 52;
+    }
+    else if (N <= 20) {
+      // 16-20 элементов
+      if (maxLength <= 2) fontSize = 40;
+      else if (maxLength <= 3) fontSize = 35;
+    }
   }
 
   for (let i = 0; i < N; i++) {

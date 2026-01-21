@@ -116,3 +116,10 @@ body {
     height: 1.5em;
   }
 }
+
+@media only screen and (min-width: 1200px) {
+    #wheel-wrapper.warning {
+        height: inherit !important;
+        width: inherit !important;
+    }
+}

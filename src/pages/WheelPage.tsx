@@ -310,24 +310,6 @@ export function WheelPage() {
               </div>
             </div>
           </div>
-
-          {/* No items warning */}
-          {visibleItems.length === 0 && (
-            <div className="col-12 text-center clearfix">
-              <div style={{
-                marginTop: '20px',
-                padding: '12px 16px',
-                background: '#fff3cd',
-                border: '1px solid #ffc107',
-                borderRadius: '4px',
-                color: '#856404',
-              }}>
-                <p style={{ margin: 0, fontWeight: 500 }}>
-                  Пожалуйста, войдите в список
-                </p>
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Bottom Row with Ads and Description */}
