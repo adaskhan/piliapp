@@ -422,18 +422,18 @@ function drawWheel(
   // Определяем отступ от края для текста (динамический: чем больше элементов, тем меньше отступ)
   let textMargin = 20;
   if (N <= 6) textMargin = 25;
-  else if (N <= 10) textMargin = 20;
-  else if (N <= 15) textMargin = 18;
-  else if (N <= 20) textMargin = 15;
-  else if (N <= 30) textMargin = 13;
-  else if (N <= 50) textMargin = 10;
-  else textMargin = 8;
+  else if (N <= 10) textMargin = 23;
+  else if (N <= 15) textMargin = 20;
+  else if (N <= 20) textMargin = 18;
+  else if (N <= 30) textMargin = 15;
+  else if (N <= 50) textMargin = 13;
+  else textMargin = 10;
 
   // Определяем является ли колесо полностью цифровым (для размера шрифта)
   const isAllNumbers = N > 0 && names.every(n => /^\d+$/.test(n));
 
   // Динамический размер шрифта в зависимости от количества элементов И длины текста
-  let fontSize = 48;
+  let fontSize = 30;
 
   if (N > 100) fontSize = 7;
   else if (N > 80) fontSize = 8;
